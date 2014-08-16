@@ -27,12 +27,6 @@ function buildQuotes() {
   q.push("There is no class so pitiably wretched as that which possesses money and nothing else.|2|" + INIT);
 	return q;
 }
-//function searchQuotes(inPerson, inQuote) {
-	//var who = inQuote.split("|");
-	//return parseInt(who[1]) === inPerson;
-	//return who[1];
-//}
-// console.log("message");
 
 function getRandomNumber(low, high) {
 	return parseInt(Math.random() * (high - low) + low);
@@ -45,14 +39,14 @@ function generateRandomQuote(array) {
 	var originalRandNumber = randNumber;
 	while (loopSw) {
 		var thisQuote = array[randNumber].split("|");  // Quote, Who, Seen
-		if (thisQuote[2] === INIT)
+		if (thisQuote[2] === INIT)  // Valid quote
 			loopSw = false;
-		if(loopSw === true) {
+		else { // Already seen quote, get another if possible
 			randNumber++;
 			if(randNumber === MAX)
 				randNumber = 0;
 			else 
-				if(randNumber === originalRandNumber)
+				if(randNumber === originalRandNumber)  // None left
 					return -1;
 		}
 	}
@@ -66,15 +60,15 @@ function generateRandomQuote(array) {
 }
 function showButtons(whichType) {
 	switch(whichType) {
-		case 1:
+		case PEOPLE_BUTTONS:
 			showPeopleButtons();
 			hideTryAgainButton();
 			break;
-		case 2:
+		case TRY_AGAIN_BUTTONS:
 			hidePeopleButtons();
 			showTryAgainButton();
 			break;
-		case 3:
+		case NONE_BUTTON:
 			hidePeopleButtons();
 			hideTryAgainButton();
 			break;
@@ -96,61 +90,47 @@ function showTryAgainButton() {
 function hideTryAgainButton() {
   $('#AGAIN').hide();
 }
+function checkAnswer(selected, goodAnswer, whoArray) {
+	showButtons(TRY_AGAIN_BUTTONS);
+	if(selected == goodAnswer) {
+	  $('.correct-or-not').text(whoArray[selected] + " is Correct");
+  	right++;
+	} else {
+	  $('.correct-or-not').text(whoArray[selected] + " is Wrong, it was " + whoArray[goodAnswer]);
+  	wrong++;
+	}
+}
 
 // Global/Constants variables
 var SEEN = "Seen";
 var INIT = "Unseen";
-var PEOPLE = 1;
-var TRYAGAIN = 2;
-var NONE = 3;
+var PEOPLE_BUTTONS = 1;
+var TRY_AGAIN_BUTTONS = 2;
+var NONE_BUTTON = 3;
+	var right = 0;
+	var wrong = 0;
 
 $(document).ready(function() {
   var personArray = buildPerson();
   var quoteArray = buildQuotes();
-	var right = 0;
-	var wrong = 0;
 
 	var answer = generateRandomQuote(quoteArray);
 
-	$('#' + personArray[0]).click(function(event) { // answer should be 0
-		showButtons(TRYAGAIN);
-		if(answer === "0") {
-		  $('.correct-or-not').text(personArray[0] + " is Correct");
-	  	right++;
-		} else {
-		  $('.correct-or-not').text(personArray[0] + " is Wrong, it was " + personArray[answer]);
-	  	wrong++;
-		}
+	$('#' + personArray[0]).click(function(event) {
+		checkAnswer(0, answer, personArray);
   });
-	$('#' + personArray[1]).click(function(event) { // answer should be 1
-		showButtons(TRYAGAIN);
-		if(answer === "1") {
-		  $('.correct-or-not').text(personArray[1] + " is Correct");
-	  	right++;
-	  } else {
-		  $('.correct-or-not').text(personArray[1] + " is Wrong, it was " + personArray[answer]);
-	  	wrong++;
-		}
+	$('#' + personArray[1]).click(function(event) {
+		checkAnswer(1, answer, personArray);
   });
-	$('#' + personArray[2]).click(function(event) { // answer should be 2
-		showButtons(TRYAGAIN);
-		if(answer === "2") {
-		  $('.correct-or-not').text(personArray[2] + " is Correct");
-	  	right++;
-	  } else {
-		  $('.correct-or-not').text(personArray[2] + " is Wrong, it was " + personArray[answer]);
-	  	wrong++;
-		}
+	$('#' + personArray[2]).click(function(event) {
+		checkAnswer(2, answer, personArray);
   });
 	$('#AGAIN').click(function(event) {
-		showButtons(PEOPLE);
+		showButtons(PEOPLE_BUTTONS);
 		answer = generateRandomQuote(quoteArray);
 		var percentage = (right / (right + wrong)) * 100;
-		if (answer === -1) {
-		  showButtons(NONE);
-	    $('.correct-or-not').text("Right: " + percentage.toFixed(2) + "%, Right: " + right + " Wrong: " + wrong);
-		} else {
-	    $('.correct-or-not').text("Right: " + percentage.toFixed(2) + "%");
-		}
+		if (answer === -1)
+		  showButtons(NONE_BUTTON);
+	  $('.correct-or-not').text("Right: " + percentage.toFixed(2) + "%, Right: " + right + " Wrong: " + wrong);
   });
 });
