@@ -1,4 +1,8 @@
 Quotes
 ======
 
-Pick quotes
+Pick quotes from 
+Theodore Roosevelt
+Bill Gates
+Andrew Carnegie
+
